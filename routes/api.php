@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CarController;
 
@@ -14,19 +15,49 @@ Route::get('/test', function () {
     ]);
 });
 
-// Brands - Marka CRUD əməliyyatları
-Route::apiResource('brands', BrandController::class);
+// ============================================
+// AUTH ROUTES (Public)
+// ============================================
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+    
+    // Protected auth routes
+    Route::middleware('auth:api')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::post('refresh', [AuthController::class, 'refresh']);
+        Route::get('me', [AuthController::class, 'me']);
+        Route::put('profile', [AuthController::class, 'updateProfile']);
+    });
+});
 
-// Cars - Maşın CRUD əməliyyatları
-Route::apiResource('cars', CarController::class);
+// ============================================
+// PUBLIC ROUTES (Authentication lazım deyil)
+// ============================================
 
-// Car Images - Şəkil əməliyyatları
-Route::post('cars/{car}/images', [CarController::class, 'addImages']);
-Route::delete('cars/{car}/images/{image}', [CarController::class, 'deleteImage']);
-Route::put('cars/{car}/images/{image}/primary', [CarController::class, 'setPrimaryImage']);
+// Brands - public
+Route::get('brands', [BrandController::class, 'index']);
+Route::get('brands/{brand}', [BrandController::class, 'show']);
 
-// Əlavə filter route-ları
-Route::get('cars/brand/{brandId}', function($brandId) {
+// Cars - public
+Route::get('cars', [CarController::class, 'index']);
+Route::get('cars/{car}', [CarController::class, 'show']);
+
+// Featured cars
+Route::get('cars-featured', function() {
+    $cars = \App\Models\Car::featured()
+        ->with(['brand', 'images'])
+        ->limit(6)
+        ->get();
+    
+    return response()->json([
+        'success' => true,
+        'data' => $cars
+    ]);
+});
+
+// Cars by brand
+Route::get('brands/{brandId}/cars', function($brandId) {
     $cars = \App\Models\Car::where('brand_id', $brandId)
         ->with(['brand', 'images'])
         ->paginate(12);
@@ -37,14 +68,23 @@ Route::get('cars/brand/{brandId}', function($brandId) {
     ]);
 });
 
-Route::get('cars/featured', function() {
-    $cars = \App\Models\Car::featured()
-        ->with(['brand', 'images'])
-        ->limit(6)
-        ->get();
+// ============================================
+// PROTECTED ROUTES (JWT Authentication lazımdır)
+// ============================================
+Route::middleware('auth:api')->group(function () {
     
-    return response()->json([
-        'success' => true,
-        'data' => $cars
-    ]);
+    // Brands - CRUD (Admin only)
+    Route::post('brands', [BrandController::class, 'store']);
+    Route::put('brands/{brand}', [BrandController::class, 'update']);
+    Route::delete('brands/{brand}', [BrandController::class, 'destroy']);
+    
+    // Cars - CRUD (Admin only)
+    Route::post('cars', [CarController::class, 'store']);
+    Route::put('cars/{car}', [CarController::class, 'update']);
+    Route::delete('cars/{car}', [CarController::class, 'destroy']);
+    
+    // Car Images (Admin only)
+    Route::post('cars/{car}/images', [CarController::class, 'addImages']);
+    Route::delete('cars/{car}/images/{image}', [CarController::class, 'deleteImage']);
+    Route::put('cars/{car}/images/{image}/primary', [CarController::class, 'setPrimaryImage']);
 });
