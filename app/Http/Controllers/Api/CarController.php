@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Validator;
 class CarController extends Controller
 {
     // GET /api/cars - Bütün maşınları gətir
+    /**
+ * @OA\PathItem(path="/api/cars")
+ */
     public function index(Request $request)
     {
         $query = Car::with(['brand', 'images' => function($q) {
@@ -69,6 +72,16 @@ class CarController extends Controller
     }
 
     // GET /api/cars/{id} - Bir maşını gətir
+    /**
+     * @OA\Get(
+     *     path="/api/cars/{id}",
+     *     summary="Bir maşını gətir",
+     *     tags={"Cars"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Uğurlu"),
+     *     @OA\Response(response=404, description="Tapılmadı")
+     * )
+     */
     public function show($id)
     {
         $car = Car::with(['brand', 'images', 'specifications'])
@@ -91,6 +104,43 @@ class CarController extends Controller
     }
 
     // POST /api/cars - Yeni maşın yarat
+     /**
+     * @OA\Post(
+     *     path="/api/cars",
+     *     summary="Yeni maşın yarat",
+     *     tags={"Cars"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"brand_id","name","status"},
+     *             @OA\Property(property="brand_id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="status", type="string"),
+     *             @OA\Property(property="registration_year", type="string"),
+     *             @OA\Property(property="mileage", type="integer"),
+     *             @OA\Property(property="body_type", type="string"),
+     *             @OA\Property(property="engine", type="string"),
+     *             @OA\Property(property="fuel_type", type="string"),
+     *             @OA\Property(property="transmission", type="string"),
+     *             @OA\Property(property="power_hp", type="integer"),
+     *             @OA\Property(property="power_kw", type="integer"),
+     *             @OA\Property(property="v_max", type="integer"),
+     *             @OA\Property(property="acceleration", type="string"),
+     *             @OA\Property(property="price", type="number"),
+     *             @OA\Property(property="currency", type="string"),
+     *             @OA\Property(property="color_exterior", type="string"),
+     *             @OA\Property(property="color_interior", type="string"),
+     *             @OA\Property(property="doors", type="integer"),
+     *             @OA\Property(property="seats", type="integer"),
+     *             @OA\Property(property="vin", type="string"),
+     *             @OA\Property(property="is_featured", type="boolean")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Yaradıldı"),
+     *     @OA\Response(response=422, description="Validation xətası")
+     * )
+     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -191,6 +241,28 @@ class CarController extends Controller
     }
 
     // PUT/PATCH /api/cars/{id} - Maşını yenilə
+     /**
+     * @OA\Put(
+     *     path="/api/cars/{id}",
+     *     summary="Maşını yenilə",
+     *     tags={"Cars"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="brand_id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="status", type="string"),
+     *             @OA\Property(property="price", type="number"),
+     *             @OA\Property(property="is_featured", type="boolean")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Yeniləndi"),
+     *     @OA\Response(response=404, description="Tapılmadı"),
+     *     @OA\Response(response=422, description="Validation xətası")
+     * )
+     */
     public function update(Request $request, $id)
     {
         $car = Car::find($id);
@@ -244,6 +316,17 @@ class CarController extends Controller
     }
 
     // DELETE /api/cars/{id} - Maşını sil
+
+     /**
+     * @OA\Delete(
+     *     path="/api/cars/{id}",
+     *     summary="Maşını sil",
+     *     tags={"Cars"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Silindi"),
+     *     @OA\Response(response=404, description="Tapılmadı")
+     * )
+     */
     public function destroy($id)
     {
         $car = Car::find($id);
@@ -274,6 +357,29 @@ class CarController extends Controller
     }
 
     // POST /api/cars/{id}/images - Şəkil əlavə et
+
+
+    /**
+     * @OA\Post(
+     *     path="/api/cars/{id}/images",
+     *     summary="Şəkil əlavə et",
+     *     tags={"Car Images"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="images[]", type="array", @OA\Items(type="string", format="binary")),
+     *                 @OA\Property(property="image_type", type="string")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Şəkillər əlavə olundu"),
+     *     @OA\Response(response=404, description="Maşın tapılmadı"),
+     *     @OA\Response(response=422, description="Validation xətası")
+     * )
+     */
     public function addImages(Request $request, $id)
     {
         $car = Car::find($id);
@@ -324,6 +430,18 @@ class CarController extends Controller
     }
 
     // DELETE /api/cars/{carId}/images/{imageId} - Şəkil sil
+
+     /**
+     * @OA\Delete(
+     *     path="/api/cars/{carId}/images/{imageId}",
+     *     summary="Şəkil sil",
+     *     tags={"Car Images"},
+     *     @OA\Parameter(name="carId", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="imageId", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Şəkil silindi"),
+     *     @OA\Response(response=404, description="Şəkil tapılmadı")
+     * )
+     */
     public function deleteImage($carId, $imageId)
     {
         $image = CarImage::where('car_id', $carId)->find($imageId);
@@ -345,6 +463,17 @@ class CarController extends Controller
     }
 
     // PUT /api/cars/{carId}/images/{imageId}/primary - Əsas şəkil et
+     /**
+     * @OA\Put(
+     *     path="/api/cars/{carId}/images/{imageId}/primary",
+     *     summary="Əsas şəkil et",
+     *     tags={"Car Images"},
+     *     @OA\Parameter(name="carId", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="imageId", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Əsas şəkil dəyişdirildi"),
+     *     @OA\Response(response=404, description="Şəkil tapılmadı")
+     * )
+     */
     public function setPrimaryImage($carId, $imageId)
     {
         $car = Car::find($carId);
