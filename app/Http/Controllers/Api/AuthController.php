@@ -2,39 +2,40 @@
 
 namespace App\Http\Controllers\Api;
 
-use OpenApi\Annotations as OA;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+// DİQQƏT: Annotations yox, Attributes istifadə edirik
+use OpenApi\Attributes as OA;
 
-/**
- * @OA\PathItem(path="/api/auth")
- */
+#[OA\Info(title: "Mansory API", version: "1.0.0", description: "API Documentation")]
+#[OA\Server(url: 'http://localhost:8000', description: "Local Server")]
+#[OA\SecurityScheme(
+    securityScheme: 'bearerAuth',
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT'
+)]
 class AuthController extends Controller
 {
-    // POST /api/auth/register
-    /**
-     * @OA\Post(
-     *     path="/api/auth/register",
-     *     summary="İstifadəçi qeydiyyatı",
-     *     tags={"Authentication"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"name","email","password","password_confirmation"},
-     *             @OA\Property(property="name", type="string", example="Islam"),
-     *             @OA\Property(property="email", type="string", example="user@mail.com"),
-     *             @OA\Property(property="password", type="string", example="12345678"),
-     *             @OA\Property(property="password_confirmation", type="string", example="12345678")
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Uğurlu qeydiyyat"),
-     *     @OA\Response(response=422, description="Validation xətası")
-     * )
-     */
+    #[OA\Post(path: '/api/auth/register', summary: 'İstifadəçi qeydiyyatı', tags: ['Authentication'])]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['name', 'email', 'password', 'password_confirmation'],
+            properties: [
+                new OA\Property(property: 'name', type: 'string', example: 'Islam'),
+                new OA\Property(property: 'email', type: 'string', example: 'user@mail.com'),
+                new OA\Property(property: 'password', type: 'string', example: '12345678'),
+                new OA\Property(property: 'password_confirmation', type: 'string', example: '12345678')
+            ]
+        )
+    )]
+    #[OA\Response(response: 201, description: 'Uğurlu qeydiyyat')]
+    #[OA\Response(response: 422, description: 'Validation xətası')]
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -44,10 +45,7 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
         $user = User::create([
@@ -70,25 +68,19 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // POST /api/auth/login
-    /**
-     * @OA\Post(
-     *     path="/api/auth/login",
-     *     summary="İstifadəçi girişi",
-     *     description="E-poçt və şifrə ilə JWT token əldə edin",
-     *     tags={"Authentication"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"email","password"},
-     *             @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="123456")
-     *         )
-     *     ),
-     *     @OA\Response(response=200, description="Uğurlu giriş"),
-     *     @OA\Response(response=401, description="Məlumatlar yanlışdır")
-     * )
-     */
+    #[OA\Post(path: '/api/auth/login', summary: 'İstifadəçi girişi', tags: ['Authentication'])]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['email', 'password'],
+            properties: [
+                new OA\Property(property: 'email', type: 'string', example: 'admin@example.com'),
+                new OA\Property(property: 'password', type: 'string', example: '123456')
+            ]
+        )
+    )]
+    #[OA\Response(response: 200, description: 'Uğurlu giriş')]
+    #[OA\Response(response: 401, description: 'Səhv məlumat')]
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -97,121 +89,53 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
         if (!$token = JWTAuth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Email və ya şifrə yanlışdır'
-            ], 401);
+            return response()->json(['success' => false, 'message' => 'Email və ya şifrə yanlışdır'], 401);
         }
 
         return $this->respondWithToken($token);
     }
 
-    // GET /api/me
-    /**
-     * @OA\Get(
-     *     path="/api/me",
-     *     summary="Cari istifadəçi məlumatı",
-     *     tags={"Authentication"},
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Uğurlu")
-     * )
-     */
+    #[OA\Get(path: '/api/me', summary: 'Cari istifadəçi', security: [['bearerAuth' => []]], tags: ['Authentication'])]
+    #[OA\Response(response: 200, description: 'Uğurlu')]
     public function me()
     {
-        return response()->json([
-            'success' => true,
-            'data' => JWTAuth::user()
-        ]);
+        return response()->json(['success' => true, 'data' => JWTAuth::user()]);
     }
 
-    // POST /api/auth/logout
-    /**
-     * @OA\Post(
-     *     path="/api/auth/logout",
-     *     summary="İstifadəçi çıxışı",
-     *     tags={"Authentication"},
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Uğurlu çıxış")
-     * )
-     */
+    #[OA\Post(path: '/api/auth/logout', summary: 'Çıxış', security: [['bearerAuth' => []]], tags: ['Authentication'])]
+    #[OA\Response(response: 200, description: 'Uğurlu')]
     public function logout()
     {
         JWTAuth::invalidate(JWTAuth::getToken());
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Çıxış uğurlu'
-        ]);
+        return response()->json(['success' => true, 'message' => 'Çıxış uğurlu']);
     }
 
-    // POST /api/auth/refresh
-    /**
-     * @OA\Post(
-     *     path="/api/auth/refresh",
-     *     summary="Token yeniləmə",
-     *     tags={"Authentication"},
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Uğurlu token yenilənməsi",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="access_token", type="string"),
-     *             @OA\Property(property="token_type", type="string", example="bearer"),
-     *             @OA\Property(property="expires_in", type="integer")
-     *         )
-     *     )
-     * )
-     */
+    #[OA\Post(path: '/api/auth/refresh', summary: 'Token yenilə', security: [['bearerAuth' => []]], tags: ['Authentication'])]
+    #[OA\Response(response: 200, description: 'Uğurlu')]
     public function refresh()
     {
-        $newToken = JWTAuth::refresh(JWTAuth::getToken());
-
-        return $this->respondWithToken($newToken);
+        return $this->respondWithToken(JWTAuth::refresh(JWTAuth::getToken()));
     }
 
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'success' => true,
-            'message' => 'Giriş uğurlu',
-            'data' => [
-                'user' => JWTAuth::user(),
-                'access_token' => $token,
-                'token_type' => 'bearer',
-                'expires_in' => JWTAuth::factory()->getTTL() * 60
+    #[OA\Put(path: '/api/profile', summary: 'Profil yenilə', security: [['bearerAuth' => []]], tags: ['Authentication'])]
+    #[OA\RequestBody(
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'name', type: 'string', example: 'Islam'),
+                new OA\Property(property: 'email', type: 'string', example: 'user@mail.com'),
+                new OA\Property(property: 'password', type: 'string', example: '12345678'),
+                new OA\Property(property: 'password_confirmation', type: 'string', example: '12345678')
             ]
-        ]);
-    }
-
-    // PUT /api/profile
-    /**
-     * @OA\Put(
-     *     path="/api/profile",
-     *     summary="Profil yeniləmə",
-     *     tags={"Authentication"},
-     *     security={{"bearerAuth":{}}},
-     *     @OA\RequestBody(
-     *         required=false,
-     *         @OA\JsonContent(
-     *             @OA\Property(property="name", type="string", example="Islam"),
-     *             @OA\Property(property="email", type="string", example="user@mail.com"),
-     *             @OA\Property(property="password", type="string", example="12345678"),
-     *             @OA\Property(property="password_confirmation", type="string", example="12345678")
-     *         )
-     *     ),
-     *     @OA\Response(response=200, description="Profil yeniləndi"),
-     *     @OA\Response(response=422, description="Validation xətası")
-     * )
-     */
+        )
+    )]
+    #[OA\Response(response: 200, description: 'Yeniləndi')]
     public function updateProfile(Request $request)
     {
         $user = JWTAuth::user();
-
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
@@ -219,24 +143,29 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
         $data = $validator->validated();
-
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
 
         $user->update($data);
+        return response()->json(['success' => true, 'message' => 'Profil yeniləndi', 'data' => $user]);
+    }
 
+    protected function respondWithToken($token)
+    {
         return response()->json([
             'success' => true,
-            'message' => 'Profil yeniləndi',
-            'data' => $user
+            'message' => 'Uğurlu',
+            'data' => [
+                'user' => JWTAuth::user(),
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => JWTAuth::factory()->getTTL() * 60
+            ]
         ]);
     }
 }
