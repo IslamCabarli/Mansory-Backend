@@ -107,7 +107,7 @@ class BrandController extends Controller
         // Yeni logo yüklə
         if ($request->hasFile('logo')) {
             // Köhnə logonu sil
-            if ($brand->logo) {
+            if ($brand->logo && Storage::disk('public')->exists($brand->logo)) {
                 Storage::disk('public')->delete($brand->logo);
             }
             $data['logo'] = $request->file('logo')->store('brands', 'public');
@@ -135,7 +135,7 @@ class BrandController extends Controller
         }
 
         // Logo sil
-        if ($brand->logo) {
+        if ($brand->logo && Storage::disk('public')->exists($brand->logo)) {
             Storage::disk('public')->delete($brand->logo);
         }
 
