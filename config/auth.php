@@ -21,11 +21,11 @@ return [
 
     'guards' => [
         'web' => [
-            'driver' => 'session',
+            'driver' => 'jwt',
             'provider' => 'users',
         ],
         
-        // JWT API guard əlavə et
+        
         'api' => [
             'driver' => 'jwt',
             'provider' => 'users',
