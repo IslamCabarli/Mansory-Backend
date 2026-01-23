@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage; // Bunu əlavə etdik
 
 class Brand extends Model
 {
@@ -18,9 +19,21 @@ class Brand extends Model
         'is_active',
     ];
 
+    
+    protected $appends = ['logo_url']; 
+
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+
+    public function getLogoUrlAttribute()
+    {
+        if (!$this->logo) {
+            return null; 
+        }
+        return asset('storage/' . $this->logo);
+    }
 
     // Relationships
     public function cars()
