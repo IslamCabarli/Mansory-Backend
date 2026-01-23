@@ -11,6 +11,15 @@ use Illuminate\Support\Facades\Validator;
 class BrandController extends Controller
 {
     // GET /api/brands - Bütün markaları gətir
+    /**
+     * @OA\Get(
+     *     path="/api/brands",
+     *     summary="Bütün markaları gətir",
+     *     tags={"Brands"},
+     *     @OA\Response(response=200, description="Uğurlu")
+     * )
+     */
+
     public function index()
     {
         $brands = Brand::withCount('cars')
@@ -24,6 +33,21 @@ class BrandController extends Controller
     }
 
     // GET /api/brands/{id} - Bir markanı gətir
+     /**
+     * @OA\Get(
+     *     path="/api/brands/{id}",
+     *     summary="Bir markanı gətir",
+     *     tags={"Brands"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Uğurlu"),
+     *     @OA\Response(response=404, description="Tapılmadı")
+     * )
+     */
     public function show($id)
     {
         $brand = Brand::with(['cars' => function($query) {
@@ -44,6 +68,24 @@ class BrandController extends Controller
     }
 
     // POST /api/brands - Yeni marka yarat
+    /**
+     * @OA\Post(
+     *     path="/api/brands",
+     *     summary="Yeni marka yarat",
+     *     tags={"Brands"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="is_active", type="boolean")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Yaradıldı"),
+     *     @OA\Response(response=422, description="Validation xətası")
+     * )
+     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -77,6 +119,26 @@ class BrandController extends Controller
     }
 
     // PUT/PATCH /api/brands/{id} - Markanı yenilə
+
+    /**
+     * @OA\Put(
+     *     path="/api/brands/{id}",
+     *     summary="Markanı yenilə",
+     *     tags={"Brands"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="is_active", type="boolean")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Yeniləndi"),
+     *     @OA\Response(response=404, description="Tapılmadı"),
+     *     @OA\Response(response=422, description="Validation xətası")
+     * )
+     */
     public function update(Request $request, $id)
     {
         $brand = Brand::find($id);
@@ -123,6 +185,16 @@ class BrandController extends Controller
     }
 
     // DELETE /api/brands/{id} - Markanı sil
+    /**
+     * @OA\Delete(
+     *     path="/api/brands/{id}",
+     *     summary="Markanı sil",
+     *     tags={"Brands"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Silindi"),
+     *     @OA\Response(response=404, description="Tapılmadı")
+     * )
+     */
     public function destroy($id)
     {
         $brand = Brand::find($id);
