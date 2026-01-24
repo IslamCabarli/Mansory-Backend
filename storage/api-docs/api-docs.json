@@ -104,13 +104,13 @@
                 }
             }
         },
-        "/api/me": {
+        "/api/auth/me": {
             "get": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Cari istifadəçi",
-                "operationId": "8367feff40ba10e43187792cad3132c1",
+                "operationId": "b5de204f5e452ef51327c691aa99e77c",
                 "responses": {
                     "200": {
                         "description": "Uğurlu"

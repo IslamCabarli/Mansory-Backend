@@ -99,7 +99,7 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    #[OA\Get(path: '/api/me', summary: 'Cari istifadəçi', security: [['bearerAuth' => []]], tags: ['Authentication'])]
+    #[OA\Get(path: '/api/auth/me', summary: 'Cari istifadəçi', security: [['bearerAuth' => []]], tags: ['Authentication'])]
     #[OA\Response(response: 200, description: 'Uğurlu')]
     public function me()
     {
