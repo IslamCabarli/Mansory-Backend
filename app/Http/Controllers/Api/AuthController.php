@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
-// DİQQƏT: Annotations yox, Attributes istifadə edirik
+
 use OpenApi\Attributes as OA;
 
 #[OA\Info(title: "Mansory API", version: "1.0.0", description: "API Documentation")]
