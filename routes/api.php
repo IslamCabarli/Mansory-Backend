@@ -67,7 +67,6 @@ Route::get('brands/{brandId}/cars', function($brandId) {
         'data' => $cars
     ]);
 });
-
 // ============================================
 // PROTECTED ROUTES (JWT Authentication lazımdır)
 // ============================================

@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // API middleware
+        $middleware->alias([
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
