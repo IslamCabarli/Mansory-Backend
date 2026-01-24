@@ -70,7 +70,7 @@ Route::get('brands/{brandId}/cars', function($brandId) {
 // ============================================
 // PROTECTED ROUTES (JWT Authentication lazımdır)
 // ============================================
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:api', 'admin')->group(function () {
     
     // Brands - CRUD (Admin only)
     Route::post('brands', [BrandController::class, 'store']);
