@@ -132,6 +132,8 @@ class CarController extends Controller
     #[OA\Delete(path: '/api/cars/{id}', summary: 'Maşını sil', tags: ['Cars'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Silindi')]
+
+    // MAsin sil
     public function destroy($id)
     {
         $car = Car::find($id);
@@ -140,6 +142,8 @@ class CarController extends Controller
         $car->delete();
         return response()->json(['success' => true, 'message' => 'Silindi']);
     }
+
+
 
     #[OA\Post(path: '/api/cars/{id}/images', summary: 'Şəkil əlavə et', tags: ['Car Images'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
@@ -155,6 +159,8 @@ class CarController extends Controller
         )
     )]
     #[OA\Response(response: 201, description: 'Əlavə edildi')]
+
+    //   Sekil elave et
     public function addImages(Request $request, $id)
     {
         $car = Car::find($id);
@@ -177,6 +183,8 @@ class CarController extends Controller
     #[OA\Parameter(name: 'carId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Parameter(name: 'imageId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Silindi')]
+
+    //      Delete car image
     public function deleteImage($carId, $imageId)
     {
         $image = CarImage::where('car_id', $carId)->find($imageId);
@@ -191,6 +199,8 @@ class CarController extends Controller
     #[OA\Parameter(name: 'carId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Parameter(name: 'imageId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Uğurlu')]
+
+    //    Sekil esas et
     public function setPrimaryImage($carId, $imageId)
     {
         $car = Car::find($carId);
