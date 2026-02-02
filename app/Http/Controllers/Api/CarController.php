@@ -96,6 +96,7 @@ class CarController extends Controller
             'brand_id' => 'required|exists:brands,id',
             'name' => 'required|string|max:255',
             'status' => 'required|in:available,sold,reserved',
+            'registration_year' => 'nullable|string|max:10',
             'price' => 'nullable|numeric|min:0',
             'vin' => 'nullable|string|unique:cars',
             'is_featured' => 'boolean',
