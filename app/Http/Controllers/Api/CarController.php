@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
 class CarController extends Controller
@@ -75,144 +76,345 @@ class CarController extends Controller
     }
 
     #[OA\Post(path: '/api/cars', summary: 'Yeni maşın yarat', tags: ['Cars'])]
-    #[OA\RequestBody(
-        required: true,
-        content: new OA\JsonContent(
-            required: ['brand_id', 'name', 'status', 'price'],
-            properties: [
-                new OA\Property(property: 'brand_id', type: 'integer', example: 1),
-                new OA\Property(property: 'name', type: 'string', example: 'Mercedes S-Class'),
-                new OA\Property(property: 'status', type: 'string', enum: ['available', 'sold', 'reserved']),
-                new OA\Property(property: 'price', type: 'number', example: 150000),
-                new OA\Property(property: 'currency', type: 'string', example: 'USD'),
-                new OA\Property(property: 'is_featured', type: 'boolean', example: false)
-            ]
-        )
-    )]
     #[OA\Response(response: 201, description: 'Yaradıldı')]
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'brand_id' => 'required|exists:brands,id',
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'status' => 'required|in:available,sold,reserved',
             'registration_year' => 'nullable|string|max:10',
+            'mileage' => 'nullable|integer|min:0',
+            'body_type' => 'nullable|string|max:100',
+            'engine' => 'nullable|string|max:255',
+            'fuel_type' => 'nullable|string|max:50',
+            'transmission' => 'nullable|string|max:50',
+            'power_hp' => 'nullable|integer|min:0',
+            'power_kw' => 'nullable|integer|min:0',
+            'v_max' => 'nullable|integer|min:0',
+            'acceleration' => 'nullable|string|max:20',
             'price' => 'nullable|numeric|min:0',
-            'vin' => 'nullable|string|unique:cars',
+            'currency' => 'nullable|string|max:10',
+            'color_exterior' => 'nullable|string|max:100',
+            'color_interior' => 'nullable|string|max:100',
+            'doors' => 'nullable|integer|min:2|max:5',
+            'seats' => 'nullable|integer|min:2|max:9',
+            'vin' => 'nullable|string|unique:cars,vin',
             'is_featured' => 'boolean',
+            
+            // ✅ Specifications validation
+            'specifications' => 'nullable|array',
+            'specifications.*.spec_label' => 'required|string|max:255',
+            'specifications.*.spec_value' => 'required|string|max:255',
+            'specifications.*.spec_unit' => 'nullable|string|max:50',
+            'specifications.*.spec_category' => 'nullable|string|max:50',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         DB::beginTransaction();
         try {
-            $car = Car::create($validator->validated());
+            $data = $validator->validated();
+            
+            // ✅ Extract specifications
+            $specifications = $data['specifications'] ?? [];
+            unset($data['specifications']);
+
+            // Create car
+            $car = Car::create($data);
+
+            // ✅ Add specifications
+            if (!empty($specifications)) {
+                foreach ($specifications as $index => $spec) {
+                    $car->specifications()->create([
+                        'spec_key' => $spec['spec_key'] ?? Str::slug($spec['spec_label'], '_'),
+                        'spec_label' => $spec['spec_label'],
+                        'spec_value' => $spec['spec_value'],
+                        'spec_unit' => $spec['spec_unit'] ?? null,
+                        'spec_category' => $spec['spec_category'] ?? 'general',
+                        'sort_order' => $index
+                    ]);
+                }
+            }
+
             DB::commit();
-            return response()->json(['success' => true, 'data' => $car], 201);
+
+            // ✅ Load relationships
+            $car->load(['brand', 'images', 'specifications']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Car created successfully',
+                'data' => $car
+            ], 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create car: ' . $e->getMessage()
+            ], 500);
         }
     }
 
     #[OA\Put(path: '/api/cars/{id}', summary: 'Maşını yenilə', tags: ['Cars'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\RequestBody(content: new OA\JsonContent(properties: [new OA\Property(property: 'name', type: 'string')]))]
     #[OA\Response(response: 200, description: 'Yeniləndi')]
     public function update(Request $request, $id)
     {
         $car = Car::find($id);
-        if (!$car) return response()->json(['success' => false, 'message' => 'Tapılmadı'], 404);
+        
+        if (!$car) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Car not found'
+            ], 404);
+        }
 
-        $car->update($request->all());
-        return response()->json(['success' => true, 'data' => $car->load('brand')]);
+        $validator = Validator::make($request->all(), [
+            'brand_id' => 'sometimes|required|exists:brands,id',
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'sometimes|required|in:available,sold,reserved',
+            'registration_year' => 'nullable|string|max:10',
+            'mileage' => 'nullable|integer|min:0',
+            'body_type' => 'nullable|string|max:100',
+            'engine' => 'nullable|string|max:255',
+            'fuel_type' => 'nullable|string|max:50',
+            'transmission' => 'nullable|string|max:50',
+            'power_hp' => 'nullable|integer|min:0',
+            'power_kw' => 'nullable|integer|min:0',
+            'v_max' => 'nullable|integer|min:0',
+            'acceleration' => 'nullable|string|max:20',
+            'price' => 'nullable|numeric|min:0',
+            'currency' => 'nullable|string|max:10',
+            'color_exterior' => 'nullable|string|max:100',
+            'color_interior' => 'nullable|string|max:100',
+            'doors' => 'nullable|integer|min:2|max:5',
+            'seats' => 'nullable|integer|min:2|max:9',
+            'vin' => 'nullable|string|unique:cars,vin,' . $id,
+            'is_featured' => 'boolean',
+            
+            // ✅ Specifications validation
+            'specifications' => 'nullable|array',
+            'specifications.*.spec_label' => 'required|string|max:255',
+            'specifications.*.spec_value' => 'required|string|max:255',
+            'specifications.*.spec_unit' => 'nullable|string|max:50',
+            'specifications.*.spec_category' => 'nullable|string|max:50',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $data = $validator->validated();
+            
+            // ✅ Extract specifications
+            $specifications = $data['specifications'] ?? null;
+            unset($data['specifications']);
+
+            // Update car basic data
+            $car->update($data);
+
+            // ✅ Update specifications if provided
+            if ($specifications !== null) {
+                // Delete old specifications
+                $car->specifications()->delete();
+                
+                // Create new specifications
+                foreach ($specifications as $index => $spec) {
+                    $car->specifications()->create([
+                        'spec_key' => $spec['spec_key'] ?? Str::slug($spec['spec_label'], '_'),
+                        'spec_label' => $spec['spec_label'],
+                        'spec_value' => $spec['spec_value'],
+                        'spec_unit' => $spec['spec_unit'] ?? null,
+                        'spec_category' => $spec['spec_category'] ?? 'general',
+                        'sort_order' => $index
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            // ✅ Load relationships
+            $car->load(['brand', 'images', 'specifications']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Car updated successfully',
+                'data' => $car
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update car: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     #[OA\Delete(path: '/api/cars/{id}', summary: 'Maşını sil', tags: ['Cars'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Silindi')]
-
-    // MAsin sil
     public function destroy($id)
     {
         $car = Car::find($id);
-        if (!$car) return response()->json(['success' => false, 'message' => 'Tapılmadı'], 404);
+        
+        if (!$car) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Car not found'
+            ], 404);
+        }
 
-        $car->delete();
-        return response()->json(['success' => true, 'message' => 'Silindi']);
+        DB::beginTransaction();
+        try {
+            // Delete all images from storage
+            foreach ($car->images as $image) {
+                if (Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
+                }
+            }
+            
+            // Delete car (will cascade delete images and specifications)
+            $car->delete();
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Car deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete car: ' . $e->getMessage()
+            ], 500);
+        }
     }
-
-
 
     #[OA\Post(path: '/api/cars/{id}/images', summary: 'Şəkil əlavə et', tags: ['Car Images'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\RequestBody(
-        content: new OA\MediaType(
-            mediaType: 'multipart/form-data',
-            schema: new OA\Schema(
-                properties: [
-                    new OA\Property(property: 'images[]', type: 'array', items: new OA\Items(type: 'string', format: 'binary')),
-                    new OA\Property(property: 'image_type', type: 'string', default: 'gallery')
-                ]
-            )
-        )
-    )]
     #[OA\Response(response: 201, description: 'Əlavə edildi')]
-
-    //   Sekil elave et
     public function addImages(Request $request, $id)
     {
         $car = Car::find($id);
-        if (!$car) return response()->json(['success' => false, 'message' => 'Maşın yoxdur'], 404);
+        
+        if (!$car) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Car not found'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120',
+            'image_type' => 'required|in:main,gallery,interior,exterior'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $uploadedImages = [];
-        foreach ($request->file('images', []) as $index => $image) {
+        $sortOrder = $car->images()->count();
+
+        foreach ($request->file('images', []) as $image) {
             $path = $image->store('cars/' . $car->id, 'public');
-            $uploadedImages[] = CarImage::create([
+            
+            $carImage = CarImage::create([
                 'car_id' => $car->id,
                 'image_path' => $path,
                 'image_type' => $request->get('image_type', 'gallery'),
+                'sort_order' => $sortOrder++,
                 'is_primary' => false
             ]);
+            
+            $uploadedImages[] = $carImage;
         }
-        return response()->json(['success' => true, 'data' => $uploadedImages], 201);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Images uploaded successfully',
+            'data' => $uploadedImages
+        ], 201);
     }
 
     #[OA\Delete(path: '/api/cars/{carId}/images/{imageId}', summary: 'Şəkil sil', tags: ['Car Images'])]
     #[OA\Parameter(name: 'carId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Parameter(name: 'imageId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Silindi')]
-
-    //      Delete car image
     public function deleteImage($carId, $imageId)
     {
         $image = CarImage::where('car_id', $carId)->find($imageId);
-        if (!$image) return response()->json(['success' => false, 'message' => 'Şəkil yoxdur'], 404);
+        
+        if (!$image) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Image not found'
+            ], 404);
+        }
 
-        Storage::disk('public')->delete($image->image_path);
+        if (Storage::disk('public')->exists($image->image_path)) {
+            Storage::disk('public')->delete($image->image_path);
+        }
+
         $image->delete();
-        return response()->json(['success' => true, 'message' => 'Silindi']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Image deleted successfully'
+        ]);
     }
 
     #[OA\Put(path: '/api/cars/{carId}/images/{imageId}/primary', summary: 'Əsas şəkil et', tags: ['Car Images'])]
     #[OA\Parameter(name: 'carId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Parameter(name: 'imageId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Uğurlu')]
-
-    //    Sekil esas et
     public function setPrimaryImage($carId, $imageId)
     {
         $car = Car::find($carId);
-        if (!$car) return response()->json(['success' => false, 'message' => 'Maşın yoxdur'], 404);
+        
+        if (!$car) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Car not found'
+            ], 404);
+        }
+
+        $image = $car->images()->find($imageId);
+        
+        if (!$image) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Image not found'
+            ], 404);
+        }
 
         $car->images()->update(['is_primary' => false]);
-        $image = $car->images()->find($imageId);
-        if ($image) {
-            $image->update(['is_primary' => true]);
-            return response()->json(['success' => true, 'data' => $image]);
-        }
-        return response()->json(['success' => false, 'message' => 'Şəkil yoxdur'], 404);
+        $image->update(['is_primary' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Primary image set successfully',
+            'data' => $image
+        ]);
     }
 }
