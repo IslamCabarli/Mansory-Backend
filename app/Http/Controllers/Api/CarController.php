@@ -80,6 +80,7 @@ class CarController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            // Masin ucun validasiyalar
             'brand_id' => 'required|exists:brands,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -102,8 +103,6 @@ class CarController extends Controller
             'seats' => 'nullable|integer|min:2|max:9',
             'vin' => 'nullable|string|unique:cars,vin',
             'is_featured' => 'boolean',
-            
-            // ✅ Specifications validation
             'specifications' => 'nullable|array',
             'specifications.*.spec_label' => 'required|string|max:255',
             'specifications.*.spec_value' => 'required|string|max:255',
@@ -122,14 +121,14 @@ class CarController extends Controller
         try {
             $data = $validator->validated();
             
-            // ✅ Extract specifications
+    
             $specifications = $data['specifications'] ?? [];
             unset($data['specifications']);
 
-            // Create car
+        
             $car = Car::create($data);
 
-            // ✅ Add specifications
+            
             if (!empty($specifications)) {
                 foreach ($specifications as $index => $spec) {
                     $car->specifications()->create([
@@ -145,7 +144,7 @@ class CarController extends Controller
 
             DB::commit();
 
-            // ✅ Load relationships
+            
             $car->load(['brand', 'images', 'specifications']);
 
             return response()->json([
@@ -200,8 +199,6 @@ class CarController extends Controller
             'seats' => 'nullable|integer|min:2|max:9',
             'vin' => 'nullable|string|unique:cars,vin,' . $id,
             'is_featured' => 'boolean',
-            
-            // ✅ Specifications validation
             'specifications' => 'nullable|array',
             'specifications.*.spec_label' => 'required|string|max:255',
             'specifications.*.spec_value' => 'required|string|max:255',
@@ -220,19 +217,14 @@ class CarController extends Controller
         try {
             $data = $validator->validated();
             
-            // ✅ Extract specifications
             $specifications = $data['specifications'] ?? null;
             unset($data['specifications']);
 
-            // Update car basic data
             $car->update($data);
 
-            // ✅ Update specifications if provided
             if ($specifications !== null) {
-                // Delete old specifications
                 $car->specifications()->delete();
                 
-                // Create new specifications
                 foreach ($specifications as $index => $spec) {
                     $car->specifications()->create([
                         'spec_key' => $spec['spec_key'] ?? Str::slug($spec['spec_label'], '_'),
@@ -247,7 +239,6 @@ class CarController extends Controller
 
             DB::commit();
 
-            // ✅ Load relationships
             $car->load(['brand', 'images', 'specifications']);
 
             return response()->json([
@@ -281,14 +272,14 @@ class CarController extends Controller
 
         DB::beginTransaction();
         try {
-            // Delete all images from storage
+            
             foreach ($car->images as $image) {
                 if (Storage::disk('public')->exists($image->image_path)) {
                     Storage::disk('public')->delete($image->image_path);
                 }
             }
             
-            // Delete car (will cascade delete images and specifications)
+            
             $car->delete();
             
             DB::commit();
