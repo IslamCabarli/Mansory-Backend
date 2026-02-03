@@ -32,7 +32,7 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 // ============================================
-// PUBLIC ROUTES (Authentication lazım deyil)
+// PUBLIC ROUTES 
 // ============================================
 
 // Brands - public
@@ -68,7 +68,7 @@ Route::get('brands/{brandId}/cars', function($brandId) {
     ]);
 });
 // ============================================
-// PROTECTED ROUTES (JWT Authentication lazımdır)
+// PROTECTED ROUTES 
 // ============================================
 Route::middleware('auth:api', 'admin')->group(function () {
     

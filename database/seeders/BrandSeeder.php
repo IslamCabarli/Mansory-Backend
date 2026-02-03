@@ -40,6 +40,32 @@ class BrandSeeder extends Seeder
                 'description' => 'Compact city cars with unique design',
                 'is_active' => true,
             ],
+            [
+                'name' => 'Lamborghini',
+                'slug' => 'lamborghini',
+                'description' => 'Italian brand known for luxury sports cars and SUVs',
+                'is_active' => true,
+
+            ],
+            [
+                'name' => 'Bentley',
+                'slug' => 'bentley',
+                'description' => 'British manufacturer of luxury cars and SUVs',
+                'is_active' => true,
+            ]
+            ,
+            [
+                'name' => 'Rolls-Royce',
+                'slug' => 'rolls-royce',
+                'description' => 'Iconic British brand synonymous with luxury and elegance',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Lotus',
+                'slug' => 'lotus',
+                'description' => 'British manufacturer of sports and racing cars',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($brands as $brand) {
