@@ -7,8 +7,8 @@
     },
     "servers": [
         {
-            "url": "http://localhost:8000",
-            "description": "Local Server"
+            "url": "/api",
+            "description": "Default Server"
         }
     ],
     "paths": {
@@ -457,52 +457,6 @@
                 ],
                 "summary": "Yeni maşın yarat",
                 "operationId": "fbbced9da0be8a33be9dfad182f803bb",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "brand_id",
-                                    "name",
-                                    "status",
-                                    "price"
-                                ],
-                                "properties": {
-                                    "brand_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "name": {
-                                        "type": "string",
-                                        "example": "Mercedes S-Class"
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "available",
-                                            "sold",
-                                            "reserved"
-                                        ]
-                                    },
-                                    "price": {
-                                        "type": "number",
-                                        "example": 150000
-                                    },
-                                    "currency": {
-                                        "type": "string",
-                                        "example": "USD"
-                                    },
-                                    "is_featured": {
-                                        "type": "boolean",
-                                        "example": false
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
                 "responses": {
                     "201": {
                         "description": "Yaradıldı"
@@ -552,20 +506,6 @@
                         }
                     }
                 ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
                 "responses": {
                     "200": {
                         "description": "Yeniləndi"
@@ -612,28 +552,6 @@
                         }
                     }
                 ],
-                "requestBody": {
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "properties": {
-                                    "images[]": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "binary"
-                                        }
-                                    },
-                                    "image_type": {
-                                        "type": "string",
-                                        "default": "gallery"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
                 "responses": {
                     "201": {
                         "description": "Əlavə edildi"

@@ -6,8 +6,8 @@ use OpenApi\Attributes as OA;
     description: "Avtomobil satış sistemi üçün API sənədləşməsi"
 )]
 #[OA\Server(
-    url: 'http://localhost:8000',
-    description: "Əsas API Server"
+    url: '/api',
+    description: "Default Server"
 )]
 #[OA\SecurityScheme(
     securityScheme: "bearerAuth",
