@@ -22,7 +22,7 @@ class AdminMiddleware
         if ($user->role !== 'admin') {
             return response()->json([
                 'success' => false,
-                'message' => 'Bu əməliyyat üçün admin icazəsi lazımdır'
+                'message' => 'Bu əməliyyat üçün admin icazəsi lazimdir'
             ], 403);
         }
 

@@ -15,9 +15,6 @@ Route::get('/test', function () {
     ]);
 });
 
-// ============================================
-// AUTH ROUTES (Public)
-// ============================================
 Route::group(['prefix' => 'auth'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
@@ -31,19 +28,17 @@ Route::group(['prefix' => 'auth'], function () {
     });
 });
 
-// ============================================
-// PUBLIC ROUTES 
-// ============================================
 
-// Brands - public
+
+
 Route::get('brands', [BrandController::class, 'index']);
 Route::get('brands/{brand}', [BrandController::class, 'show']);
 
-// Cars - public
+
 Route::get('cars', [CarController::class, 'index']);
 Route::get('cars/{car}', [CarController::class, 'show']);
 
-// Featured cars
+
 Route::get('cars-featured', function() {
     $cars = \App\Models\Car::featured()
         ->with(['brand', 'images'])
@@ -56,7 +51,7 @@ Route::get('cars-featured', function() {
     ]);
 });
 
-// Cars by brand
+
 Route::get('brands/{brandId}/cars', function($brandId) {
     $cars = \App\Models\Car::where('brand_id', $brandId)
         ->with(['brand', 'images'])
@@ -67,22 +62,20 @@ Route::get('brands/{brandId}/cars', function($brandId) {
         'data' => $cars
     ]);
 });
-// ============================================
-// PROTECTED ROUTES 
-// ============================================
+
 Route::middleware('auth:api', 'admin')->group(function () {
     
-    // Brands - CRUD (Admin only)
+
     Route::post('brands', [BrandController::class, 'store']);
     Route::put('brands/{brand}', [BrandController::class, 'update']);
     Route::delete('brands/{brand}', [BrandController::class, 'destroy']);
     
-    // Cars - CRUD (Admin only)
+
     Route::post('cars', [CarController::class, 'store']);
     Route::put('cars/{car}', [CarController::class, 'update']);
     Route::delete('cars/{car}', [CarController::class, 'destroy']);
     
-    // Car Images (Admin only)
+
     Route::post('cars/{car}/images', [CarController::class, 'addImages']);
     Route::delete('cars/{car}/images/{image}', [CarController::class, 'deleteImage']);
     Route::put('cars/{car}/images/{image}/primary', [CarController::class, 'setPrimaryImage']);

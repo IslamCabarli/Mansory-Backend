@@ -313,7 +313,7 @@ class CarController extends Controller
 
         $validator = Validator::make($request->all(), [
             'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp,avif|max:5120',
             'image_type' => 'required|in:main,gallery,interior,exterior'
         ]);
 
