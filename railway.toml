@@ -3,3 +3,4 @@ builder = "railpack"
 
 [build.railpack]
 php = "8.4"
+composerArgs = "--no-platform-reqs"
