@@ -12,7 +12,7 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use OpenApi\Attributes as OA;
 
 #[OA\Info(title: "Mansory API", version: "1.0.0", description: "API Documentation")]
-#[OA\Server(url: '', description: "Default Server")]
+#[OA\Server(url:'https://mansory-backend-production.up.railway.app/api', description: "Default Server")]
 #[OA\SecurityScheme(
     securityScheme: 'bearerAuth',
     type: 'http',

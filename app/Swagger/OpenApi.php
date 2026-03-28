@@ -6,7 +6,7 @@ use OpenApi\Attributes as OA;
     description: "Avtomobil satış sistemi üçün API sənədləşməsi"
 )]
 #[OA\Server(
-    url: '',
+    url: 'https://mansory-backend-production.up.railway.app/api',
     description: "Default Server"
 )]
 #[OA\SecurityScheme(
