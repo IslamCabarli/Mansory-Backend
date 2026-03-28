@@ -7,18 +7,18 @@
     },
     "servers": [
         {
-            "url": "/api",
+            "url": "",
             "description": "Default Server"
         }
     ],
     "paths": {
-        "/api/auth/register": {
+        "/auth/register": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "İstifadəçi qeydiyyatı",
-                "operationId": "c7bb21a0d87049e161b8e4c9b0d909f2",
+                "operationId": "08136088c4862c313b35d6518bab8d3a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -63,13 +63,13 @@
                 }
             }
         },
-        "/api/auth/login": {
+        "/auth/login": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "İstifadəçi girişi",
-                "operationId": "dd51a484b7fa0f97c7680fdbde14cf5f",
+                "operationId": "99d66635c4992aeaa6aa44ff653d0563",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -104,13 +104,13 @@
                 }
             }
         },
-        "/api/auth/me": {
+        "/auth/me": {
             "get": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Cari istifadəçi",
-                "operationId": "b5de204f5e452ef51327c691aa99e77c",
+                "operationId": "7edae2cdbaafc10dff8c9c4198b320a2",
                 "responses": {
                     "200": {
                         "description": "Uğurlu"
@@ -123,13 +123,13 @@
                 ]
             }
         },
-        "/api/auth/logout": {
+        "/auth/logout": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Çıxış",
-                "operationId": "df9bdc6c7a6d9f20b983526b2ec0f698",
+                "operationId": "6abf3b64a4bc7838d56346f05a5153af",
                 "responses": {
                     "200": {
                         "description": "Uğurlu"
@@ -142,13 +142,13 @@
                 ]
             }
         },
-        "/api/auth/refresh": {
+        "/auth/refresh": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Token yenilə",
-                "operationId": "30c20c52f5f72828d8c531fd7c9ea3e7",
+                "operationId": "e7ab7446393758bb71fd1946a349e500",
                 "responses": {
                     "200": {
                         "description": "Uğurlu"
@@ -161,13 +161,13 @@
                 ]
             }
         },
-        "/api/profile": {
+        "/profile": {
             "put": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Profil yenilə",
-                "operationId": "4ac9a00014f69a885c9373fdefcaf6f9",
+                "operationId": "9e87afe7cdc492b6edf2b574e8c11dd4",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -207,13 +207,13 @@
                 ]
             }
         },
-        "/api/brands": {
+        "/brands": {
             "get": {
                 "tags": [
                     "Brands"
                 ],
                 "summary": "Bütün markaları gətir",
-                "operationId": "130f2bd423b6fe2355253e2c39878d99",
+                "operationId": "3194c70c8bb4fde9800394fbad2d7da4",
                 "responses": {
                     "200": {
                         "description": "Uğurlu"
@@ -225,7 +225,7 @@
                     "Brands"
                 ],
                 "summary": "Yeni marka yarat",
-                "operationId": "283de011874bd2a1ada6efafb676e83f",
+                "operationId": "00e4394555f4b2be559ddb1a81e6eb97",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -263,13 +263,13 @@
                 }
             }
         },
-        "/api/brands/{id}": {
+        "/brands/{id}": {
             "get": {
                 "tags": [
                     "Brands"
                 ],
                 "summary": "Bir markanı gətir",
-                "operationId": "2086e16f9b1a70aea714677ef42808a7",
+                "operationId": "75210478e6edd30c8d81e7e567c9edd5",
                 "parameters": [
                     {
                         "name": "id",
@@ -294,7 +294,7 @@
                     "Brands"
                 ],
                 "summary": "Markanı yenilə",
-                "operationId": "40baf1fc4e11f1ccc369eb0b36b56f54",
+                "operationId": "8bd4819a9aab73897c4a41e0ddf9a291",
                 "parameters": [
                     {
                         "name": "id",
@@ -340,7 +340,7 @@
                     "Brands"
                 ],
                 "summary": "Markanı sil",
-                "operationId": "b3f38ad7a979e5c78ac4e95ceb640c7e",
+                "operationId": "f7608df716e5409229aa95924d680fb1",
                 "parameters": [
                     {
                         "name": "id",
@@ -361,13 +361,13 @@
                 }
             }
         },
-        "/api/cars": {
+        "/cars": {
             "get": {
                 "tags": [
                     "Cars"
                 ],
                 "summary": "Bütün maşınları gətir (Filtr və Search ilə)",
-                "operationId": "4e913ee0b6125f5ad41f32df1df5b8a4",
+                "operationId": "443cb17c5b7a91b32f5afb1e69ab15ac",
                 "parameters": [
                     {
                         "name": "brand_id",
@@ -456,7 +456,7 @@
                     "Cars"
                 ],
                 "summary": "Yeni maşın yarat",
-                "operationId": "fbbced9da0be8a33be9dfad182f803bb",
+                "operationId": "ae307c47686b637cabfb1f841cbcf4c9",
                 "responses": {
                     "201": {
                         "description": "Yaradıldı"
@@ -464,13 +464,13 @@
                 }
             }
         },
-        "/api/cars/{id}": {
+        "/cars/{id}": {
             "get": {
                 "tags": [
                     "Cars"
                 ],
                 "summary": "Bir maşını gətir",
-                "operationId": "27c826192271dae5e6e7246be568b4ca",
+                "operationId": "5f18ad02312214b8912a2d1f46cb9483",
                 "parameters": [
                     {
                         "name": "id",
@@ -495,7 +495,7 @@
                     "Cars"
                 ],
                 "summary": "Maşını yenilə",
-                "operationId": "f84c9fc1375930730b178bbf270fa554",
+                "operationId": "46151e5a8dfdc17ddeac777312a2278a",
                 "parameters": [
                     {
                         "name": "id",
@@ -517,7 +517,7 @@
                     "Cars"
                 ],
                 "summary": "Maşını sil",
-                "operationId": "75e30982110a5b0506c52b55cd0f15f8",
+                "operationId": "f9459ac1fb4746d494702e5aa483500d",
                 "parameters": [
                     {
                         "name": "id",
@@ -535,13 +535,13 @@
                 }
             }
         },
-        "/api/cars/{id}/images": {
+        "/cars/{id}/images": {
             "post": {
                 "tags": [
                     "Car Images"
                 ],
                 "summary": "Şəkil əlavə et",
-                "operationId": "e270a2db14123e50ed4b4bedb30d9801",
+                "operationId": "587e96ba519200f285b6526d40743bba",
                 "parameters": [
                     {
                         "name": "id",
@@ -559,13 +559,13 @@
                 }
             }
         },
-        "/api/cars/{carId}/images/{imageId}": {
+        "/cars/{carId}/images/{imageId}": {
             "delete": {
                 "tags": [
                     "Car Images"
                 ],
                 "summary": "Şəkil sil",
-                "operationId": "d2754a0215251d0a0fd118a14a247d9b",
+                "operationId": "a4bb755176f690c975b01e8176cdaa58",
                 "parameters": [
                     {
                         "name": "carId",
@@ -591,13 +591,13 @@
                 }
             }
         },
-        "/api/cars/{carId}/images/{imageId}/primary": {
+        "/cars/{carId}/images/{imageId}/primary": {
             "put": {
                 "tags": [
                     "Car Images"
                 ],
                 "summary": "Əsas şəkil et",
-                "operationId": "8d33f2448f6ea04a4fc10c30f2c92f53",
+                "operationId": "0dd76ef2ebee684e833b959f8f4e4767",
                 "parameters": [
                     {
                         "name": "carId",

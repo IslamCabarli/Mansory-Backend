@@ -16,7 +16,7 @@ use OpenApi\Attributes as OA;
 class CarController extends Controller
 {
     #[OA\Get(
-        path: '/api/cars',
+        path: '/cars',
         summary: 'Bütün maşınları gətir (Filtr və Search ilə)',
         tags: ['Cars'],
         parameters: [
@@ -59,7 +59,7 @@ class CarController extends Controller
         return response()->json(['success' => true, 'data' => $cars]);
     }
 
-    #[OA\Get(path: '/api/cars/{id}', summary: 'Bir maşını gətir', tags: ['Cars'])]
+    #[OA\Get(path: '/cars/{id}', summary: 'Bir maşını gətir', tags: ['Cars'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Uğurlu')]
     #[OA\Response(response: 404, description: 'Tapılmadı')]
@@ -75,7 +75,7 @@ class CarController extends Controller
         return response()->json(['success' => true, 'data' => $car]);
     }
 
-    #[OA\Post(path: '/api/cars', summary: 'Yeni maşın yarat', tags: ['Cars'])]
+    #[OA\Post(path: '/cars', summary: 'Yeni maşın yarat', tags: ['Cars'])]
     #[OA\Response(response: 201, description: 'Yaradıldı')]
     public function store(Request $request)
     {
@@ -162,7 +162,7 @@ class CarController extends Controller
         }
     }
 
-    #[OA\Put(path: '/api/cars/{id}', summary: 'Maşını yenilə', tags: ['Cars'])]
+    #[OA\Put(path: '/cars/{id}', summary: 'Maşını yenilə', tags: ['Cars'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Yeniləndi')]
     public function update(Request $request, $id)
@@ -256,7 +256,7 @@ class CarController extends Controller
         }
     }
 
-    #[OA\Delete(path: '/api/cars/{id}', summary: 'Maşını sil', tags: ['Cars'])]
+    #[OA\Delete(path: '/cars/{id}', summary: 'Maşını sil', tags: ['Cars'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Silindi')]
     public function destroy($id)
@@ -297,7 +297,7 @@ class CarController extends Controller
         }
     }
 
-    #[OA\Post(path: '/api/cars/{id}/images', summary: 'Şəkil əlavə et', tags: ['Car Images'])]
+    #[OA\Post(path: '/cars/{id}/images', summary: 'Şəkil əlavə et', tags: ['Car Images'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 201, description: 'Əlavə edildi')]
     public function addImages(Request $request, $id)
@@ -348,7 +348,7 @@ class CarController extends Controller
         ], 201);
     }
 
-    #[OA\Delete(path: '/api/cars/{carId}/images/{imageId}', summary: 'Şəkil sil', tags: ['Car Images'])]
+    #[OA\Delete(path: '/cars/{carId}/images/{imageId}', summary: 'Şəkil sil', tags: ['Car Images'])]
     #[OA\Parameter(name: 'carId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Parameter(name: 'imageId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Silindi')]
@@ -375,7 +375,7 @@ class CarController extends Controller
         ]);
     }
 
-    #[OA\Put(path: '/api/cars/{carId}/images/{imageId}/primary', summary: 'Əsas şəkil et', tags: ['Car Images'])]
+    #[OA\Put(path: '/cars/{carId}/images/{imageId}/primary', summary: 'Əsas şəkil et', tags: ['Car Images'])]
     #[OA\Parameter(name: 'carId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Parameter(name: 'imageId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Uğurlu')]

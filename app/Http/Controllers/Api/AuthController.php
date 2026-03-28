@@ -21,7 +21,7 @@ use OpenApi\Attributes as OA;
 )]
 class AuthController extends Controller
 {
-    #[OA\Post(path: '/api/auth/register', summary: 'İstifadəçi qeydiyyatı', tags: ['Authentication'])]
+    #[OA\Post(path: '/auth/register', summary: 'İstifadəçi qeydiyyatı', tags: ['Authentication'])]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -68,7 +68,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    #[OA\Post(path: '/api/auth/login', summary: 'İstifadəçi girişi', tags: ['Authentication'])]
+    #[OA\Post(path: '/auth/login', summary: 'İstifadəçi girişi', tags: ['Authentication'])]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -99,14 +99,14 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    #[OA\Get(path: '/api/auth/me', summary: 'Cari istifadəçi', security: [['bearerAuth' => []]], tags: ['Authentication'])]
+    #[OA\Get(path: '/auth/me', summary: 'Cari istifadəçi', security: [['bearerAuth' => []]], tags: ['Authentication'])]
     #[OA\Response(response: 200, description: 'Uğurlu')]
     public function me()
     {
         return response()->json(['success' => true, 'data' => JWTAuth::user()]);
     }
 
-    #[OA\Post(path: '/api/auth/logout', summary: 'Çıxış', security: [['bearerAuth' => []]], tags: ['Authentication'])]
+    #[OA\Post(path: '/auth/logout', summary: 'Çıxış', security: [['bearerAuth' => []]], tags: ['Authentication'])]
     #[OA\Response(response: 200, description: 'Uğurlu')]
     public function logout()
     {
@@ -114,14 +114,14 @@ class AuthController extends Controller
         return response()->json(['success' => true, 'message' => 'Çıxış uğurlu']);
     }
 
-    #[OA\Post(path: '/api/auth/refresh', summary: 'Token yenilə', security: [['bearerAuth' => []]], tags: ['Authentication'])]
+    #[OA\Post(path: '/auth/refresh', summary: 'Token yenilə', security: [['bearerAuth' => []]], tags: ['Authentication'])]
     #[OA\Response(response: 200, description: 'Uğurlu')]
     public function refresh()
     {
         return $this->respondWithToken(JWTAuth::refresh(JWTAuth::getToken()));
     }
 
-    #[OA\Put(path: '/api/profile', summary: 'Profil yenilə', security: [['bearerAuth' => []]], tags: ['Authentication'])]
+    #[OA\Put(path: '/profile', summary: 'Profil yenilə', security: [['bearerAuth' => []]], tags: ['Authentication'])]
     #[OA\RequestBody(
         content: new OA\JsonContent(
             properties: [

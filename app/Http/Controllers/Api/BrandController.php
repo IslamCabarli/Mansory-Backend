@@ -11,7 +11,7 @@ use OpenApi\Attributes as OA;
 
 class BrandController extends Controller
 {
-    #[OA\Get(path: '/api/brands', summary: 'Bütün markaları gətir', tags: ['Brands'])]
+    #[OA\Get(path: '/brands', summary: 'Bütün markaları gətir', tags: ['Brands'])]
     #[OA\Response(response: 200, description: 'Uğurlu')]
     public function index()
     {
@@ -25,7 +25,7 @@ class BrandController extends Controller
         ]);
     }
 
-    #[OA\Get(path: '/api/brands/{id}', summary: 'Bir markanı gətir', tags: ['Brands'])]
+    #[OA\Get(path: '/brands/{id}', summary: 'Bir markanı gətir', tags: ['Brands'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Uğurlu')]
     #[OA\Response(response: 404, description: 'Tapılmadı')]
@@ -48,7 +48,7 @@ class BrandController extends Controller
         ]);
     }
 
-    #[OA\Post(path: '/api/brands', summary: 'Yeni marka yarat', tags: ['Brands'])]
+    #[OA\Post(path: '/brands', summary: 'Yeni marka yarat', tags: ['Brands'])]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -93,7 +93,7 @@ class BrandController extends Controller
         ], 201);
     }
 
-    #[OA\Put(path: '/api/brands/{id}', summary: 'Markanı yenilə', tags: ['Brands'])]
+    #[OA\Put(path: '/brands/{id}', summary: 'Markanı yenilə', tags: ['Brands'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\RequestBody(
         required: false,
@@ -150,7 +150,7 @@ class BrandController extends Controller
         ]);
     }
 
-    #[OA\Delete(path: '/api/brands/{id}', summary: 'Markanı sil', tags: ['Brands'])]
+    #[OA\Delete(path: '/brands/{id}', summary: 'Markanı sil', tags: ['Brands'])]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Silindi')]
     #[OA\Response(response: 404, description: 'Tapılmadı')]
