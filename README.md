@@ -1,59 +1,195 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# ⚙️ Mansory Backend
 
-## About Laravel
+**RESTful API for Mansory Frontend — built with Laravel**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+[![Laravel](https://img.shields.io/badge/Laravel-10+-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com/)
+[![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net/)
+[![MySQL](https://img.shields.io/badge/MySQL-8+-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Railway](https://img.shields.io/badge/Deployed%20on-Railway-0B0D0E?style=flat-square&logo=railway)](https://mansory-backend-production.up.railway.app)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+[🌐 API Base URL](https://mansory-backend-production.up.railway.app/api) · [🐛 Report a Bug](../../issues) · [💻 Frontend Repo](https://github.com/IslamCabarli/mansory-frontend)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+</div>
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Table of Contents
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- [About](#about)
+- [API Endpoints](#api-endpoints)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Database](#database)
+- [Deployment](#deployment)
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## About
 
-### Premium Partners
+**Mansory Backend** is the Laravel REST API that serves car, brand, and image data to the Mansory Frontend application. It runs on Railway with a MySQL database.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**Base URL:** `https://mansory-backend-production.up.railway.app/`
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## API Endpoints
 
-## Code of Conduct
+### Cars
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/cars` | List all cars | ✅ |
+| `GET` | `/cars/{id}` | Get a single car | ✅ |
+| `POST` | `/cars` | Create a new car | ✅ |
+| `PUT` | `/cars/{id}` | Update a car | ✅ |
+| `DELETE` | `/cars/{id}` | Delete a car | ✅ |
 
-## Security Vulnerabilities
+### Brands
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/brands` | List all brands | ✅ |
+| `GET` | `/brands/{id}` | Get a single brand | ✅ |
+| `POST` | `/brands` | Create a new brand | ✅ |
+| `DELETE` | `/brands/{id}` | Delete a brand | ✅ |
 
-## License
+### Images
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `POST` | `/cars/{id}/images` | Upload an image for a car | ✅ |
+| `DELETE` | `/cars/{id}/images/{imageId}` | Delete an image | ✅ |
+
+---
+
+## Tech Stack
+
+| Technology | Version | Purpose |
+|---|---|---|
+| [Laravel](https://laravel.com/) | 10+ | Core framework |
+| [PHP](https://www.php.net/) | 8.1+ | Programming language |
+| [MySQL](https://www.mysql.com/) | 8+ | Database |
+| [Laravel Sanctum](https://laravel.com/docs/sanctum) | — | API authentication |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **PHP** ≥ 8.1
+- **Composer** → [getcomposer.org](https://getcomposer.org)
+- **MySQL** ≥ 8.0
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/IslamCabarli/mansory-backend.git
+cd mansory-backend
+
+# 2. Install dependencies
+composer install
+
+# 3. Create the environment file
+cp .env.example .env
+
+# 4. Generate the application key
+php artisan key:generate
+
+# 5. Run database migrations
+php artisan migrate
+
+# 6. (Optional) Seed with sample data
+php artisan db:seed
+
+# 7. Start the local server
+php artisan serve
+```
+
+API is ready at: **http://localhost:8000/api**
+
+---
+
+## Environment Variables
+
+Fill in the following variables in your `.env` file:
+
+```env
+APP_NAME=MansoryBackend
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=mansory
+DB_USERNAME=root
+DB_PASSWORD=
+
+FILESYSTEM_DISK=public
+```
+
+> ⚠️ Never commit your `.env` file to git.
+
+---
+
+## Database
+
+### Main Tables
+
+```
+brands          cars                  car_images
+──────          ────                  ──────────
+id              id                    id
+name            brand_id (FK)         car_id (FK)
+created_at      name                  path
+updated_at      engine                created_at
+                power
+                acceleration
+                top_speed
+                price
+                description
+                created_at
+                updated_at
+```
+
+### Migrations
+
+```bash
+php artisan migrate           # Create tables
+php artisan migrate:fresh     # Drop and recreate all tables
+php artisan db:seed           # Insert sample data
+```
+
+---
+
+## Deployment
+
+The project is deployed on **Railway**. Every push to the `main` branch triggers an automatic deployment.
+
+Add the following environment variables in your Railway project settings:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://mansory-backend-production.up.railway.app
+
+DB_CONNECTION=mysql
+DB_HOST=<railway-mysql-host>
+DB_PORT=3306
+DB_DATABASE=<db-name>
+DB_USERNAME=<db-user>
+DB_PASSWORD=<db-password>
+```
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ for Mansory</sub>
+</div>
