@@ -41,8 +41,8 @@
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/cars` | List all cars | ✅ |
-| `GET` | `/cars/{id}` | Get a single car | ✅ |
+| `GET` | `/cars` | List all cars | - |
+| `GET` | `/cars/{id}` | Get a single car | - |
 | `POST` | `/cars` | Create a new car | ✅ |
 | `PUT` | `/cars/{id}` | Update a car | ✅ |
 | `DELETE` | `/cars/{id}` | Delete a car | ✅ |
@@ -51,8 +51,8 @@
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
-| `GET` | `/brands` | List all brands | ✅ |
-| `GET` | `/brands/{id}` | Get a single brand | ✅ |
+| `GET` | `/brands` | List all brands | - |
+| `GET` | `/brands/{id}` | Get a single brand | - |
 | `POST` | `/brands` | Create a new brand | ✅ |
 | `DELETE` | `/brands/{id}` | Delete a brand | ✅ |
 
