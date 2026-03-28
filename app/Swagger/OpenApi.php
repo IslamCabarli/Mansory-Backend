@@ -6,7 +6,7 @@ use OpenApi\Attributes as OA;
     description: "Avtomobil satış sistemi üçün API sənədləşməsi"
 )]
 #[OA\Server(
-    url: '/api',
+    url: '',
     description: "Default Server"
 )]
 #[OA\SecurityScheme(
