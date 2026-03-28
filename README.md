@@ -9,7 +9,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8+-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Railway](https://img.shields.io/badge/Deployed%20on-Railway-0B0D0E?style=flat-square&logo=railway)](https://mansory-backend-production.up.railway.app)
 
-[🌐 API Base URL](https://mansory-backend-production.up.railway.app/api) · [🐛 Report a Bug](../../issues) · [💻 Frontend Repo](https://github.com/IslamCabarli/mansory-frontend)
+[🌐 API Base URL](https://mansory-backend-production.up.railway.app/) · [🐛 Report a Bug](../../issues) · [💻 Frontend Repo](https://github.com/IslamCabarli/mansory-frontend)
 
 </div>
 
