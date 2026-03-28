@@ -63,14 +63,11 @@ Route::get('brands/{brandId}/cars', function($brandId) {
     ]);
 });
 
-Route::middleware('auth:api', 'admin')->group(function () {
-    
-
+Route::middleware(['auth:api', 'admin'])->group(function () { 
     Route::post('brands', [BrandController::class, 'store']);
     Route::put('brands/{brand}', [BrandController::class, 'update']);
     Route::delete('brands/{brand}', [BrandController::class, 'destroy']);
     
-
     Route::post('cars', [CarController::class, 'store']);
     Route::put('cars/{car}', [CarController::class, 'update']);
     Route::delete('cars/{car}', [CarController::class, 'destroy']);
