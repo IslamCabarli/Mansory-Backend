@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
@@ -319,10 +320,31 @@ class CarController extends Controller
                         'resource_type' => 'auto'
                     ]);
                     
+                    // Debug log the upload response
+                    Log::debug('Cloudinary upload response', [
+                        'upload_type' => gettype($upload),
+                        'upload_class' => get_class($upload),
+                        'upload_data' => json_encode($upload),
+                    ]);
+                    
                     // Get the secure URL from the upload response
-                    $path = $upload->getSecurePath() ?? $upload['secure_url'] ?? null;
+                    // Try different methods to access the URL
+                    $path = null;
+                    
+                    if (is_array($upload) && isset($upload['secure_url'])) {
+                        $path = $upload['secure_url'];
+                    } elseif (is_object($upload) && method_exists($upload, 'getSecurePath')) {
+                        $path = $upload->getSecurePath();
+                    } elseif (is_object($upload) && property_exists($upload, 'secure_url')) {
+                        $path = $upload->secure_url;
+                    } elseif (is_array($upload)) {
+                        $path = $upload['secure_url'] ?? $upload['url'] ?? null;
+                    }
                     
                     if (!$path) {
+                        Log::error('Cloudinary upload failed - no URL returned', [
+                            'upload_response' => (is_array($upload) ? json_encode($upload) : (string)$upload)
+                        ]);
                         return response()->json([
                             'success' => false, 
                             'message' => 'Failed to get image URL from Cloudinary'
@@ -339,6 +361,12 @@ class CarController extends Controller
                     
                     $uploadedImages[] = $carImage;
                 } catch (\Exception $e) {
+                    Log::error('Cloudinary upload error', [
+                        'exception' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine()
+                    ]);
                     return response()->json([
                         'success' => false,
                         'message' => 'Image upload failed: ' . $e->getMessage()
@@ -352,6 +380,12 @@ class CarController extends Controller
                 'data' => $uploadedImages
             ], 201);
         } catch (\Exception $e) {
+            Log::error('Car image upload endpoint error', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred: ' . $e->getMessage()
