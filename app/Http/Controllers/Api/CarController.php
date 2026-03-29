@@ -273,9 +273,30 @@ class CarController extends Controller
         DB::beginTransaction();
         try {
             foreach ($car->images as $image) {
-                // Hər bir şəkli Cloudinary-dən silirik
-                $publicId = 'cars/' . $id . '/' . pathinfo($image->image_path, PATHINFO_FILENAME);
-                Cloudinary::destroy($publicId);
+                // Extract public_id from Cloudinary URL
+                // URL format: https://res.cloudinary.com/{cloud_name}/image/upload/v{version}/{public_id}.{format}
+                $urlParts = parse_url($image->image_path);
+                $pathParts = explode('/', $urlParts['path']);
+                // Find the part after 'upload' and before the file extension
+                $uploadIndex = array_search('upload', $pathParts);
+                if ($uploadIndex !== false && isset($pathParts[$uploadIndex + 1])) {
+                    $publicIdWithVersion = $pathParts[$uploadIndex + 1];
+                    // Remove version prefix (v1234567890/)
+                    $publicId = preg_replace('/^v\d+\//', '', $publicIdWithVersion);
+                } else {
+                    // Fallback: try to extract from filename
+                    $publicId = 'cars/' . $id . '/' . pathinfo($image->image_path, PATHINFO_FILENAME);
+                }
+
+                try {
+                    Cloudinary::uploadApi()->destroy($publicId);
+                } catch (\Exception $e) {
+                    // Log but don't fail the whole operation
+                    Log::warning('Failed to delete image from Cloudinary', [
+                        'public_id' => $publicId,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
             
             $car->delete();
@@ -389,13 +410,29 @@ class CarController extends Controller
         }
 
         // Cloudinary-dən şəkli silmək üçün Public ID-ni tapmalıyıq
-        // Əgər tam URL bazadadırsa, Cloudinary bunu avtomatik idarə edir (və ya əllə Public ID-ni verə bilərsən)
         try {
-            // Şəklin linkindən Public ID-ni çıxarmaq üçün (sadə variant):
-            $publicId = 'cars/' . $carId . '/' . pathinfo($image->image_path, PATHINFO_FILENAME);
-            Cloudinary::destroy($publicId);
+            // Extract public_id from Cloudinary URL
+            // URL format: https://res.cloudinary.com/{cloud_name}/image/upload/v{version}/{public_id}.{format}
+            $urlParts = parse_url($image->image_path);
+            $pathParts = explode('/', $urlParts['path']);
+            // Find the part after 'upload' and before the file extension
+            $uploadIndex = array_search('upload', $pathParts);
+            if ($uploadIndex !== false && isset($pathParts[$uploadIndex + 1])) {
+                $publicIdWithVersion = $pathParts[$uploadIndex + 1];
+                // Remove version prefix (v1234567890/)
+                $publicId = preg_replace('/^v\d+\//', '', $publicIdWithVersion);
+            } else {
+                // Fallback: try to extract from filename
+                $publicId = 'cars/' . $carId . '/' . pathinfo($image->image_path, PATHINFO_FILENAME);
+            }
+
+            Cloudinary::uploadApi()->destroy($publicId);
         } catch (\Exception $e) {
-            // Silinməsə belə bazadan silməyə davam etsin
+            // Log but don't fail the whole operation
+            Log::warning('Failed to delete image from Cloudinary', [
+                'public_id' => $publicId ?? 'unknown',
+                'error' => $e->getMessage()
+            ]);
         }
 
         $image->delete();
