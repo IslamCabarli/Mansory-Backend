@@ -32,12 +32,12 @@ class CarImage extends Model
     // Accessors
     public function getImageUrlAttribute()
     {
-        return Storage::url($this->image_path);
+        return $this->image_path;
     }
 
     public function getFullImageUrlAttribute()
     {
-        return url(Storage::url($this->image_path));
+        return $this->image_path;
     }
 
     // Scopes
