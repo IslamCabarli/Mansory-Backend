@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class CarController extends Controller
 {
@@ -261,39 +262,27 @@ class CarController extends Controller
     #[OA\Response(response: 200, description: 'Silindi')]
     public function destroy($id)
     {
-        $car = Car::find($id);
+        $car = Car::with('images')->find($id);
         
         if (!$car) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Car not found'
-            ], 404);
+            return response()->json(['success' => false, 'message' => 'Car not found'], 404);
         }
 
         DB::beginTransaction();
         try {
-            
             foreach ($car->images as $image) {
-                if (Storage::disk('public')->exists($image->image_path)) {
-                    Storage::disk('public')->delete($image->image_path);
-                }
+                // Hər bir şəkli Cloudinary-dən silirik
+                $publicId = 'cars/' . $id . '/' . pathinfo($image->image_path, PATHINFO_FILENAME);
+                Cloudinary::destroy($publicId);
             }
             
-            
             $car->delete();
-            
             DB::commit();
             
-            return response()->json([
-                'success' => true,
-                'message' => 'Car deleted successfully'
-            ]);
+            return response()->json(['success' => true, 'message' => 'Car and all images deleted successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete car: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to delete car: ' . $e->getMessage()], 500);
         }
     }
 
@@ -301,14 +290,11 @@ class CarController extends Controller
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 201, description: 'Əlavə edildi')]
     public function addImages(Request $request, $id)
-    {
+   {
         $car = Car::find($id);
         
         if (!$car) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Car not found'
-            ], 404);
+            return response()->json(['success' => false, 'message' => 'Car not found'], 404);
         }
 
         $validator = Validator::make($request->all(), [
@@ -318,21 +304,24 @@ class CarController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
         $uploadedImages = [];
         $sortOrder = $car->images()->count();
 
         foreach ($request->file('images', []) as $image) {
-            $path = $image->store('cars/' . $car->id, 'public');
+            // Laravel Storage yerinə Cloudinary-yə yükləyirik
+            $upload = Cloudinary::upload($image->getRealPath(), [
+                'folder' => 'cars/' . $car->id // Cloudinary daxilində qovluq strukturu
+            ]);
+            
+            // Cloudinary-dən gələn tam URL-i götürürük
+            $path = $upload->getSecurePath(); 
             
             $carImage = CarImage::create([
                 'car_id' => $car->id,
-                'image_path' => $path,
+                'image_path' => $path, // Artıq bazaya tam URL yazılır: https://res.cloudinary.com/...
                 'image_type' => $request->get('image_type', 'gallery'),
                 'sort_order' => $sortOrder++,
                 'is_primary' => false
@@ -343,7 +332,7 @@ class CarController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Images uploaded successfully',
+            'message' => 'Images uploaded successfully to Cloudinary',
             'data' => $uploadedImages
         ], 201);
     }
@@ -357,22 +346,22 @@ class CarController extends Controller
         $image = CarImage::where('car_id', $carId)->find($imageId);
         
         if (!$image) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Image not found'
-            ], 404);
+            return response()->json(['success' => false, 'message' => 'Image not found'], 404);
         }
 
-        if (Storage::disk('public')->exists($image->image_path)) {
-            Storage::disk('public')->delete($image->image_path);
+        // Cloudinary-dən şəkli silmək üçün Public ID-ni tapmalıyıq
+        // Əgər tam URL bazadadırsa, Cloudinary bunu avtomatik idarə edir (və ya əllə Public ID-ni verə bilərsən)
+        try {
+            // Şəklin linkindən Public ID-ni çıxarmaq üçün (sadə variant):
+            $publicId = 'cars/' . $carId . '/' . pathinfo($image->image_path, PATHINFO_FILENAME);
+            Cloudinary::destroy($publicId);
+        } catch (\Exception $e) {
+            // Silinməsə belə bazadan silməyə davam etsin
         }
 
         $image->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Image deleted successfully'
-        ]);
+        return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
     }
 
     #[OA\Put(path: '/cars/{carId}/images/{imageId}/primary', summary: 'Əsas şəkil et', tags: ['Car Images'])]
