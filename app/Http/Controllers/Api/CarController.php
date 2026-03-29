@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Cloudinary\Cloudinary as CloudinarySDK;
 
 class CarController extends Controller
 {
@@ -314,36 +315,18 @@ class CarController extends Controller
 
             foreach ($request->file('images', []) as $image) {
                 try {
-                    // Upload to Cloudinary
-                    $upload = Cloudinary::upload($image->getRealPath(), [
+                    // Upload to Cloudinary using the uploadApi method
+                    $upload = Cloudinary::uploadApi()->upload($image->getRealPath(), [
                         'folder' => 'cars/' . $car->id,
                         'resource_type' => 'auto'
                     ]);
                     
-                    // Debug log the upload response
-                    Log::debug('Cloudinary upload response', [
-                        'upload_type' => gettype($upload),
-                        'upload_class' => get_class($upload),
-                        'upload_data' => json_encode($upload),
-                    ]);
-                    
                     // Get the secure URL from the upload response
-                    // Try different methods to access the URL
-                    $path = null;
-                    
-                    if (is_array($upload) && isset($upload['secure_url'])) {
-                        $path = $upload['secure_url'];
-                    } elseif (is_object($upload) && method_exists($upload, 'getSecurePath')) {
-                        $path = $upload->getSecurePath();
-                    } elseif (is_object($upload) && property_exists($upload, 'secure_url')) {
-                        $path = $upload->secure_url;
-                    } elseif (is_array($upload)) {
-                        $path = $upload['secure_url'] ?? $upload['url'] ?? null;
-                    }
+                    $path = $upload['secure_url'] ?? null;
                     
                     if (!$path) {
                         Log::error('Cloudinary upload failed - no URL returned', [
-                            'upload_response' => (is_array($upload) ? json_encode($upload) : (string)$upload)
+                            'upload_response' => json_encode($upload)
                         ]);
                         return response()->json([
                             'success' => false, 
