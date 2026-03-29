@@ -315,14 +315,18 @@ class CarController extends Controller
 
             foreach ($request->file('images', []) as $image) {
                 try {
-                    // Upload to Cloudinary using the uploadApi method
-                    $upload = Cloudinary::uploadApi()->upload($image->getRealPath(), [
+                    // Ensure we use a valid temp path for all image uploads
+                    $localPath = $image->getRealPath() ?: $image->getPathname();
+
+                    // If JPG never uploads, force resource type to image and automatic format handling
+                    $upload = Cloudinary::uploadApi()->upload($localPath, [
                         'folder' => 'cars/' . $car->id,
-                        'resource_type' => 'auto'
+                        'resource_type' => 'image',
+                        'format' => 'auto',
                     ]);
                     
                     // Get the secure URL from the upload response
-                    $path = $upload['secure_url'] ?? null;
+                    $path = $upload['secure_url'] ?? $upload['url'] ?? null;
                     
                     if (!$path) {
                         Log::error('Cloudinary upload failed - no URL returned', [
