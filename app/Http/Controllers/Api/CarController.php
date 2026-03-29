@@ -290,51 +290,73 @@ class CarController extends Controller
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 201, description: 'Əlavə edildi')]
     public function addImages(Request $request, $id)
-   {
-        $car = Car::find($id);
-        
-        if (!$car) {
-            return response()->json(['success' => false, 'message' => 'Car not found'], 404);
-        }
+    {
+        try {
+            $car = Car::find($id);
+            
+            if (!$car) {
+                return response()->json(['success' => false, 'message' => 'Car not found'], 404);
+            }
 
-        $validator = Validator::make($request->all(), [
-            'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp,avif|max:5120',
-            'image_type' => 'required|in:main,gallery,interior,exterior'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
-
-        $uploadedImages = [];
-        $sortOrder = $car->images()->count();
-
-        foreach ($request->file('images', []) as $image) {
-            // Laravel Storage yerinə Cloudinary-yə yükləyirik
-            $upload = Cloudinary::upload($image->getRealPath(), [
-                'folder' => 'cars/' . $car->id // Cloudinary daxilində qovluq strukturu
+            $validator = Validator::make($request->all(), [
+                'images' => 'required|array',
+                'images.*' => 'image|mimes:jpeg,png,jpg,webp,avif|max:5120',
+                'image_type' => 'required|in:main,gallery,interior,exterior'
             ]);
-            
-            // Cloudinary-dən gələn tam URL-i götürürük
-            $path = $upload->getSecurePath(); 
-            
-            $carImage = CarImage::create([
-                'car_id' => $car->id,
-                'image_path' => $path, // Artıq bazaya tam URL yazılır: https://res.cloudinary.com/...
-                'image_type' => $request->get('image_type', 'gallery'),
-                'sort_order' => $sortOrder++,
-                'is_primary' => false
-            ]);
-            
-            $uploadedImages[] = $carImage;
-        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Images uploaded successfully to Cloudinary',
-            'data' => $uploadedImages
-        ], 201);
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+
+            $uploadedImages = [];
+            $sortOrder = $car->images()->count();
+
+            foreach ($request->file('images', []) as $image) {
+                try {
+                    // Upload to Cloudinary
+                    $upload = Cloudinary::upload($image->getRealPath(), [
+                        'folder' => 'cars/' . $car->id,
+                        'resource_type' => 'auto'
+                    ]);
+                    
+                    // Get the secure URL from the upload response
+                    $path = $upload->getSecurePath() ?? $upload['secure_url'] ?? null;
+                    
+                    if (!$path) {
+                        return response()->json([
+                            'success' => false, 
+                            'message' => 'Failed to get image URL from Cloudinary'
+                        ], 500);
+                    }
+                    
+                    $carImage = CarImage::create([
+                        'car_id' => $car->id,
+                        'image_path' => $path,
+                        'image_type' => $request->get('image_type', 'gallery'),
+                        'sort_order' => $sortOrder++,
+                        'is_primary' => false
+                    ]);
+                    
+                    $uploadedImages[] = $carImage;
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Image upload failed: ' . $e->getMessage()
+                    ], 500);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Images uploaded successfully to Cloudinary',
+                'data' => $uploadedImages
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     #[OA\Delete(path: '/cars/{carId}/images/{imageId}', summary: 'Şəkil sil', tags: ['Car Images'])]
