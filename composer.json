@@ -55,7 +55,7 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi",
-            "@php artisan storage:link --force --ansi" 
+            "@php artisan storage:link --force --ansi"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
@@ -80,6 +80,9 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
+        "audit": {
+            "block-insecure": false
+        },
         "sort-packages": true,
         "platform": {
             "php": "8.4.0"
