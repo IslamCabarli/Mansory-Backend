@@ -6,20 +6,13 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CarController;
 
-// Test route
-Route::get('/test', function () {
-    return response()->json([
-        'success' => true,
-        'message' => 'API işləyir!',
-        'version' => '1.0'
-    ]);
-});
+
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     
-    // Protected auth routes
+   
     Route::middleware('auth:api')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::post('refresh', [AuthController::class, 'refresh']);

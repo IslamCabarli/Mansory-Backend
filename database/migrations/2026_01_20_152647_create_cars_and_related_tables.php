@@ -65,7 +65,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('car_id')->constrained()->onDelete('cascade');
             $table->string('image_path');
-            $table->string('image_type')->default('gallery'); // main, gallery, interior, exterior
+            $table->string('image_type')->default('gallery'); 
             $table->integer('sort_order')->default(0);
             $table->boolean('is_primary')->default(false);
             $table->timestamps();
@@ -74,11 +74,11 @@ return new class extends Migration
         Schema::create('car_specifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('car_id')->constrained()->onDelete('cascade');
-            $table->string('spec_key'); // məsələn: 'wheel_size', 'battery_capacity'
-            $table->string('spec_label'); // məsələn: 'Wheel Size', 'Battery Capacity'
+            $table->string('spec_key'); 
+            $table->string('spec_label'); 
             $table->string('spec_value');
-            $table->string('spec_unit')->nullable(); // məsələn: 'inch', 'kWh'
-            $table->string('spec_category')->nullable(); // məsələn: 'performance', 'dimensions'
+            $table->string('spec_unit')->nullable(); 
+            $table->string('spec_category')->nullable();
             $table->integer('sort_order')->default(0);
             $table->timestamps();
         });
